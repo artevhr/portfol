@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Артем — Веб-разработчик</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --text: #e8e4dc;
+      --accent: #c9a96e;
+      --muted: #5a5550;
+      --line: rgba(201,169,110,0.2);
+      --card: #111110;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 300;
+      font-size: 18px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* GRAIN OVERLAY */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.035;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 28px 60px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-logo {
+      font-size: 13px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      font-family: 'DM Mono', monospace;
+      color: var(--accent);
+      font-weight: 300;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 48px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover { color: var(--accent); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 60px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-number {
+      position: absolute;
+      top: 120px;
+      right: 60px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      color: var(--muted);
+    }
+
+    .hero-line {
+      position: absolute;
+      right: 200px;
+      top: 120px;
+      bottom: 80px;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, var(--line), transparent);
+    }
+
+    .hero-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.2s;
+    }
+
+    .hero h1 {
+      font-size: clamp(64px, 9vw, 130px);
+      font-weight: 300;
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.4s;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-desc {
+      max-width: 520px;
+      font-size: 15px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-weight: 300;
+      line-height: 1.8;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.6s;
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 80px;
+      right: 60px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--muted);
+      writing-mode: vertical-rl;
+      text-transform: uppercase;
+    }
+
+    /* SECTIONS */
+    section {
+      padding: 120px 60px;
+      border-top: 1px solid var(--line);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 24px;
+      margin-bottom: 72px;
+    }
+
+    .section-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.3em;
+    }
+
+    .section-title {
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight: 300;
+      letter-spacing: -0.02em;
+    }
+
+    /* ABOUT */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .about-text {
+      font-size: 20px;
+      font-weight: 300;
+      line-height: 1.8;
+      color: #c8c4bc;
+    }
+
+    .about-text p + p { margin-top: 24px; }
+
+    .about-facts {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      border: 1px solid var(--line);
+    }
+
+    .fact {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 28px;
+      border-bottom: 1px solid var(--line);
+      transition: background 0.3s;
+    }
+
+    .fact:last-child { border-bottom: none; }
+    .fact:hover { background: var(--card); }
+
+    .fact-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .fact-value {
+      font-size: 16px;
+      color: var(--text);
+    }
+
+    /* SERVICES */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+    }
+
+    .service-card {
+      background: var(--bg);
+      padding: 48px 40px;
+      transition: background 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transition: transform 0.4s ease;
+    }
+
+    .service-card:hover { background: var(--card); }
+    .service-card:hover::before { transform: scaleX(1); }
+
+    .service-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--accent);
+      margin-bottom: 32px;
+    }
+
+    .service-name {
+      font-size: 26px;
+      font-weight: 400;
+      margin-bottom: 16px;
+    }
+
+    .service-desc {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    /* WORKS */
+    .works-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .work-item {
+      display: grid;
+      grid-template-columns: 60px 1fr auto;
+      align-items: center;
+      gap: 40px;
+      padding: 36px 0;
+      border-bottom: 1px solid var(--line);
+      cursor: default;
+      transition: padding 0.3s;
+      position: relative;
+    }
+
+    .work-item:first-child { border-top: 1px solid var(--line); }
+
+    .work-item::after {
+      content: '→';
+      position: absolute;
+      right: 0;
+      color: var(--accent);
+      font-size: 22px;
+      opacity: 0;
+      transform: translateX(-8px);
+      transition: all 0.3s;
+    }
+
+    .work-item:hover { padding-left: 16px; }
+    .work-item:hover::after { opacity: 1; transform: translateX(0); }
+
+    .work-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.2em;
+    }
+
+    .work-name {
+      font-size: 28px;
+      font-weight: 400;
+    }
+
+    .work-type {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--line);
+      padding: 6px 14px;
+    }
+
+    /* CONTACT */
+    .contact-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 120px;
+      align-items: start;
+    }
+
+    .contact-text {
+      font-size: 42px;
+      font-weight: 300;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    .contact-text em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .contact-links {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .contact-link {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--line);
+      text-decoration: none;
+      color: var(--text);
+      transition: color 0.3s;
+      font-size: 18px;
+    }
+
+    .contact-link:first-child { border-top: 1px solid var(--line); }
+    .contact-link:hover { color: var(--accent); }
+
+    .contact-link-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 40px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    footer p {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.2em;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 900px) {
+      nav { padding: 24px 28px; }
+      .nav-links { display: none; }
+      .hero { padding: 0 28px 60px; }
+      section { padding: 80px 28px; }
+      .about-grid, .contact-inner { grid-template-columns: 1fr; gap: 48px; }
+      .services-grid { grid-template-columns: 1fr; }
+      footer { padding: 32px 28px; flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <span class="nav-logo">Артем.dev</span>
+    <ul class="nav-links">
+      <li><a href="#about">Обо мне</a></li>
+      <li><a href="#services">Услуги</a></li>
+      <li><a href="#works">Работы</a></li>
+      <li><a href="#contact">Контакт</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-number">2025</div>
+    <div class="hero-line"></div>
+    <div class="hero-tag">Веб-разработчик · Москва</div>
+    <h1>Артем<br><em>делает</em><br>сайты.</h1>
+    <p class="hero-desc">
+      Одностраничные сайты с вниманием<br>к деталям, скорости и эстетике.
+    </p>
+    <span class="hero-scroll">Scroll ↓</span>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-header reveal">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Обо мне</h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>Меня зовут Артем. Мне 17 лет, и я совмещаю учёбу с созданием сайтов. Программирование — это не просто хобби, это способ мыслить точно и создавать вещи, которые работают.</p>
+        <p>Я специализируюсь на одностраничных сайтах — landing pages, портфолио, визитки. Минимализм и чёткость для меня важнее, чем избыточность. Каждый проект — это отдельная история.</p>
+        <p>Сейчас активно развиваюсь: изучаю современный стек, слежу за трендами и берусь за проекты, которые бросают вызов.</p>
+      </div>
+      <div class="about-facts reveal">
+        <div class="fact">
+          <span class="fact-label">Возраст</span>
+          <span class="fact-value">17 лет</span>
+        </div>
+        <div class="fact">
+          <span class="fact-label">Статус</span>
+          <span class="fact-value">Студент + фриланс</span>
+        </div>
+        <div class="fact">
+          <span class="fact-label">Специализация</span>
+          <span class="fact-value">Landing pages</span>
+        </div>
+        <div class="fact">
+          <span class="fact-label">Стек</span>
+          <span class="fact-value">HTML · CSS · JavaScript</span>
+        </div>
+        <div class="fact">
+          <span class="fact-label">Время выполнения</span>
+          <span class="fact-value">1 – 5 дней</span>
+        </div>
+        <div class="fact">
+          <span class="fact-label">Подход</span>
+          <span class="fact-value">Строго. Красиво. Точно.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <div class="section-header reveal">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Что я делаю</h2>
+    </div>
+    <div class="services-grid reveal">
+      <div class="service-card">
+        <div class="service-num">01</div>
+        <div class="service-name">Landing Page</div>
+        <div class="service-desc">Одностраничный сайт для продукта, услуги или события. Чёткая структура, призыв к действию, адаптивность.</div>
+      </div>
+      <div class="service-card">
+        <div class="service-num">02</div>
+        <div class="service-name">Портфолио</div>
+        <div class="service-desc">Личный сайт-визитка для фрилансеров, фотографов, дизайнеров. Сдержанный и запоминающийся.</div>
+      </div>
+      <div class="service-card">
+        <div class="service-num">03</div>
+        <div class="service-name">Бизнес-страница</div>
+        <div class="service-desc">Страница для небольшого бизнеса или стартапа. Информация, контакты, карта — всё на одном экране.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORKS -->
+  <section id="works">
+    <div class="section-header reveal">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Примеры работ</h2>
+    </div>
+    <div class="works-list">
+      <div class="work-item reveal">
+        <span class="work-num">01</span>
+        <span class="work-name">Кофейня «Nord»</span>
+        <span class="work-type">Landing page</span>
+      </div>
+      <div class="work-item reveal">
+        <span class="work-num">02</span>
+        <span class="work-name">Фотограф Алина М.</span>
+        <span class="work-type">Портфолио</span>
+      </div>
+      <div class="work-item reveal">
+        <span class="work-num">03</span>
+        <span class="work-name">Барбершоп «Blade»</span>
+        <span class="work-type">Бизнес-страница</span>
+      </div>
+      <div class="work-item reveal">
+        <span class="work-num">04</span>
+        <span class="work-name">Студия йоги</span>
+        <span class="work-type">Landing page</span>
+      </div>
+      <div class="work-item reveal">
+        <span class="work-num">05</span>
+        <span class="work-name">IT-стартап «Vexa»</span>
+        <span class="work-type">Презентация</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="section-header reveal">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Контакт</h2>
+    </div>
+    <div class="contact-inner">
+      <div class="contact-text reveal">
+        Есть идея?<br>
+        Давайте сделаем<br>
+        <em>что-то хорошее.</em>
+      </div>
+      <div class="contact-links reveal">
+        <a href="https://t.me/username" class="contact-link">
+          <span class="contact-link-label">Telegram</span>
+          <span>@username</span>
+        </a>
+        <a href="mailto:artem@example.com" class="contact-link">
+          <span class="contact-link-label">Email</span>
+          <span>artem@example.com</span>
+        </a>
+        <a href="https://vk.com/username" class="contact-link">
+          <span class="contact-link-label">ВКонтакте</span>
+          <span>vk.com/username</span>
+        </a>
+        <a href="#" class="contact-link">
+          <span class="contact-link-label">Местоположение</span>
+          <span>Россия · удалённо</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 Артем — Веб-разработчик</p>
+    <p>Одностраничные сайты · Быстро · Красиво</p>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          entry.target.style.transitionDelay = (i % 4) * 0.08 + 's';
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    reveals.forEach(el => observer.observe(el));
+
+    // Smooth nav links
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>
